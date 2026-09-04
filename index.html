@@ -15,7 +15,7 @@
       --card-border: rgba(255, 255, 255, 0.08);
       --accent-blue: #38bdf8;
       --accent-green: #10b981;
-      --accent-red: #f43f5e;
+      --accent-red: #ef4444;
       --accent-amber: #f59e0b;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -182,53 +182,24 @@
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
     }
 
-    .action-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .action-btn {
-      flex: 1;
-      padding: 10px 6px;
+    .btn-reset {
+      margin-top: 6px;
+      width: 100%;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 10px;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       cursor: pointer;
-      border: none;
       transition: all 0.2s;
-    }
-
-    .btn-opt {
-      background: linear-gradient(135deg, #0284c7, #0369a1);
-      color: white;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-    }
-
-    .btn-opt:hover {
-      background: linear-gradient(135deg, #0369a1, #075985);
-    }
-
-    .btn-subopt {
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid var(--accent-amber);
-      color: var(--accent-amber);
-    }
-
-    .btn-subopt:hover {
-      background: rgba(245, 158, 11, 0.25);
-    }
-
-    .btn-reset {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
     }
 
     .btn-reset:hover {
       background: rgba(239, 68, 68, 0.2);
-      color: var(--accent-red);
       border-color: var(--accent-red);
+      color: #ffffff;
     }
 
     .progress-wrapper {
@@ -350,11 +321,7 @@
             <strong style="color: #ec4899">800 ر.س</strong>
           </button>
           
-          <div class="action-row">
-            <button class="action-btn btn-opt" onclick="applyOptimal()">الحل الأمثل (2,000)</button>
-            <button class="action-btn btn-subopt" onclick="applySuboptimal()">تطبيق (2,200)</button>
-            <button class="action-btn btn-reset" onclick="resetAll()">تفريغ</button>
-          </div>
+          <button class="btn-reset" onclick="resetAll()">تفريغ التحديدات</button>
         </div>
       </div>
 
@@ -397,29 +364,30 @@
 </div>
 
 <script>
-  // بيانات المواقع والمسافات المقاسة لكل مربع
+  // بيانات المواقع وتحديد إزاحات واضحة لمنع أي تداخل بين الكبسولات
   const sites = {
     1: { 
       name: "S1", x: 170, y: 220, cost: 1000, covers: ['A', 'B'], active: false, color: '#f59e0b',
       distances: {
-        A: { dist: "110m", ok: true },
-        B: { dist: "130m", ok: true }
+        A: { dist: "110m", ok: true, pos: 0.5 },
+        B: { dist: "130m", ok: true, pos: 0.5 }
       }
     },
     2: { 
       name: "S2", x: 380, y: 235, cost: 1200, covers: ['B', 'C', 'D'], active: false, color: '#38bdf8',
       distances: {
-        A: { dist: "230m (>150)", ok: false },
-        B: { dist: "120m", ok: true },
-        C: { dist: "110m", ok: true },
-        D: { dist: "125m", ok: true }
+        A: { dist: "230m (>150)", ok: false, pos: 0.45, forceRed: true },
+        B: { dist: "120m", ok: true, pos: 0.5 },
+        C: { dist: "110m", ok: true, pos: 0.5 },
+        D: { dist: "125m", ok: true, pos: 0.5 }
       }
     },
     3: { 
       name: "S3", x: 260, y: 340, cost: 800, covers: ['A', 'D'], active: false, color: '#ec4899',
       distances: {
-        A: { dist: "140m", ok: true },
-        D: { dist: "135m", ok: true }
+        A: { dist: "140m", ok: true, pos: 0.5 },
+        // تم نقل موضع الكبسولة لـ 0.75 لتجنب موقع S2 تماماً
+        D: { dist: "135m", ok: true, pos: 0.75 }
       }
     }
   };
@@ -445,20 +413,6 @@
 
   function toggleDistances() {
     showDistances = !showDistances;
-  }
-
-  function applyOptimal() {
-    sites[1].active = false;
-    sites[2].active = true;
-    sites[3].active = true;
-    updateUI();
-  }
-
-  function applySuboptimal() {
-    sites[1].active = true;
-    sites[2].active = true;
-    sites[3].active = false;
-    updateUI();
   }
 
   function resetAll() {
@@ -509,17 +463,15 @@
     } else {
       fill.style.background = 'var(--accent-green)';
       if (totalCost === 2000) {
-        // الحل الأمثل الدقيق
         badge.className = 'badge badge-optimal';
         badge.innerText = 'الحل الأمثل (Optimal: 2,000)';
         alertBox.className = 'cost-alert';
         alertBox.innerText = '';
       } else {
-        // حل مقبول لكن تكلفته أعلى (Suboptimal)
         badge.className = 'badge badge-suboptimal';
         badge.innerText = 'مقبول لكن غير أمثل (Suboptimal)';
         alertBox.className = 'cost-alert warning';
-        alertBox.innerHTML = `⚠️ <strong>تنبيه هدر مالي:</strong> تم تحقيق التغطية بنسبة 100%، لكن بتكلفة (${totalCost.toLocaleString()} ر.س). الحل الأمثل المعتمد رياضياً هو (S2 + S3) بتكلفة <strong>2,000 ر.س فقط</strong> (فارق وفر 200 ر.س).`;
+        alertBox.innerHTML = `⚠️ <strong>تنبيه هدر مالي:</strong> تم تغطية جميع المربعات بنجاح، لكن التكلفة (${totalCost.toLocaleString()} ر.س). الحل الأمثل رياضياً هو اختيار (S2 + S3) بتكلفة <strong>2,000 ر.س فقط</strong>.`;
       }
     }
   }
@@ -539,7 +491,6 @@
   }
 
   function drawNeighborhood() {
-    // شبكة الشوارع
     ctx.save();
     ctx.beginPath();
     ctx.ellipse(380, 210, 150, 130, 0, Math.PI * 0.9, Math.PI * 2.1, false);
@@ -553,7 +504,6 @@
     ctx.stroke();
     ctx.restore();
 
-    // شارع المدخل الرئيسي
     ctx.beginPath();
     ctx.moveTo(90, 280);
     ctx.lineTo(260, 220);
@@ -597,26 +547,30 @@
         const dInfo = s.distances[blockKey];
         const b = blocks[blockKey];
 
+        // اختيار اللون: أحمر صريح لـ S2 -> A، أو لون الموقع المخصص
+        const lineColor = dInfo.forceRed ? '#ef4444' : (dInfo.ok ? s.color : '#ef4444');
+
         ctx.setLineDash([5, 5]);
-        ctx.strokeStyle = dInfo.ok ? s.color : '#f43f5e';
+        ctx.strokeStyle = lineColor;
         ctx.beginPath();
         ctx.moveTo(s.x, s.y);
         ctx.lineTo(b.x, b.y);
         ctx.stroke();
 
-        // كبسولة المسافة المكتوبة
-        const midX = (s.x + b.x) / 2;
-        const midY = (s.y + b.y) / 2;
+        // حساب موضع الكبسولة بناء على النسبة المحددة لمنع التراكب
+        const ratio = dInfo.pos || 0.5;
+        const midX = s.x + (b.x - s.x) * ratio;
+        const midY = s.y + (b.y - s.y) * ratio;
 
         ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-        ctx.strokeStyle = dInfo.ok ? s.color : '#f43f5e';
+        ctx.strokeStyle = lineColor;
         ctx.setLineDash([]);
         ctx.beginPath();
-        ctx.roundRect(midX - 32, midY - 10, 64, 20, 5);
+        ctx.roundRect(midX - 34, midY - 10, 68, 20, 5);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = dInfo.ok ? s.color : '#f43f5e';
+        ctx.fillStyle = lineColor;
         ctx.font = 'bold 10px Tajawal, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';

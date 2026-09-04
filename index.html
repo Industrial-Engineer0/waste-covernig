@@ -3,30 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>محاكاة بحوث العمليات - مسألة التغطية في الحي</title>
+  <title>نظام المحاكاة الذكي - بحوث العمليات (Set Covering)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
+      --bg-gradient: radial-gradient(circle at 50% 10%, #1e293b 0%, #0a0f1d 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
       --accent-blue: #38bdf8;
-      --accent-green: #22c55e;
-      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-red: #f43f5e;
+      --accent-amber: #f59e0b;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --border-color: #334155;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Tajawal', system-ui, sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
+      background: var(--bg-gradient);
       color: var(--text-main);
-      padding: 20px;
+      padding: 24px 16px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -35,50 +40,56 @@
 
     .container {
       width: 100%;
-      max-width: 960px;
+      max-width: 1020px;
       background: var(--card-bg);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      padding: 24px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(56, 189, 248, 0.05);
     }
 
     header {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       text-align: center;
     }
 
     header h1 {
-      font-size: 1.5rem;
-      color: var(--accent-blue);
+      font-size: 1.7rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 6px;
     }
 
     header p {
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
 
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 20px;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 860px) {
       .main-grid {
         grid-template-columns: 1fr;
       }
     }
 
     .canvas-card {
-      background: #090d16;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
+      background: rgba(10, 15, 29, 0.85);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.6);
       overflow: hidden;
     }
 
@@ -89,6 +100,34 @@
       display: block;
     }
 
+    .canvas-toolbar {
+      width: 100%;
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .toolbar-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .toolbar-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent-blue);
+    }
+
     .controls-card {
       display: flex;
       flex-direction: column;
@@ -96,18 +135,20 @@
     }
 
     .panel-box {
-      background: #131d31;
-      border-radius: 10px;
-      padding: 14px;
-      border: 1px solid var(--border-color);
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid var(--card-border);
     }
 
     .panel-box h3 {
       font-size: 0.95rem;
+      font-weight: 700;
       margin-bottom: 12px;
       color: var(--accent-blue);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-group {
@@ -120,60 +161,111 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--card-border);
       color: var(--text-main);
       padding: 10px 14px;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 0.85rem;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
     }
 
     .site-btn:hover {
       border-color: var(--accent-blue);
+      transform: translateX(-3px);
     }
 
     .site-btn.active {
       background: rgba(56, 189, 248, 0.15);
       border-color: var(--accent-blue);
-      color: var(--accent-blue);
-      font-weight: bold;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
     }
 
-    .optimal-btn {
-      margin-top: 6px;
-      width: 100%;
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 10px;
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 10px 6px;
       border-radius: 8px;
-      font-weight: bold;
+      font-weight: 700;
+      font-size: 0.8rem;
       cursor: pointer;
-      transition: background 0.2s;
+      border: none;
+      transition: all 0.2s;
     }
 
-    .optimal-btn:hover {
-      background: #0369a1;
+    .btn-opt {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: white;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-opt:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
+
+    .btn-reset:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+
+    .progress-wrapper {
+      margin: 10px 0 14px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-red);
+      border-radius: 99px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .status-item {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 8px;
       font-size: 0.85rem;
     }
 
     .badge {
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: bold;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: 700;
       font-size: 0.75rem;
     }
 
-    .badge-success { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
-    .badge-fail { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-fail { background: rgba(244, 63, 94, 0.15); color: var(--accent-red); border: 1px solid rgba(244, 63, 94, 0.3); }
 
     .constraints-list {
       list-style: none;
@@ -183,10 +275,17 @@
     .constraints-list li {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
-      padding: 4px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.02);
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .constraints-list li.ok {
+      border-color: rgba(16, 185, 129, 0.2);
     }
   </style>
 </head>
@@ -194,54 +293,72 @@
 
 <div class="container">
   <header>
-    <h1>توزيع الحاويات في الحي (Set Covering Problem)</h1>
-    <p>توضيح كيف يغطي الموقع S2 المربعات (B, C, D) عبر التخطيط المنحني (حذوة فرس)</p>
+    <h1>محاكاة بحوث العمليات: مسألة التغطية المثلى</h1>
+    <p>تحليل جغرافي لنطاق تغطية الحاويات (R = 150m) داخل حذوة الفرس السكنية</p>
   </header>
 
   <div class="main-grid">
     <div class="canvas-card">
       <canvas id="simCanvas" width="600" height="420"></canvas>
+      <div class="canvas-toolbar">
+        <span>📍 دائرة النطاق = 150 متراً</span>
+        <button class="toolbar-btn" onclick="toggleDistances()">تبديل عرض المسافات</button>
+      </div>
     </div>
 
     <div class="controls-card">
       <div class="panel-box">
-        <h3>المواقع المقترحة (Decision Variables)</h3>
+        <h3>المواقع المرشحة (Candidate Sites)</h3>
         <div class="btn-group">
           <button class="site-btn" id="btn-s1" onclick="toggleSite(1)">
-            <span>الموقع 1 (S1)</span>
-            <span>1,000 ر.س</span>
+            <span>الموقع الأول (S1)</span>
+            <strong style="color: var(--accent-amber)">1,000 ر.س</strong>
           </button>
           <button class="site-btn" id="btn-s2" onclick="toggleSite(2)">
-            <span>الموقع 2 (S2)</span>
-            <span>1,200 ر.س</span>
+            <span>الموقع الثاني (S2)</span>
+            <strong style="color: var(--accent-blue)">1,200 ر.س</strong>
           </button>
           <button class="site-btn" id="btn-s3" onclick="toggleSite(3)">
-            <span>الموقع 3 (S3)</span>
-            <span>800 ر.س</span>
+            <span>الموقع الثالث (S3)</span>
+            <strong style="color: #ec4899">800 ر.س</strong>
           </button>
-          <button class="optimal-btn" onclick="applyOptimal()">تطبيق الحل الأمثل (S2 + S3)</button>
+          <div class="action-row">
+            <button class="action-btn btn-opt" onclick="applyOptimal()">الحل الأمثل</button>
+            <button class="action-btn btn-reset" onclick="resetAll()">إعادة ضبط</button>
+          </div>
         </div>
       </div>
 
       <div class="panel-box">
         <h3>مؤشرات النموذج الرياضي</h3>
+        
+        <div class="progress-wrapper">
+          <div class="progress-header">
+            <span>نسبة تغطية الحي:</span>
+            <strong id="cov-pct">0%</strong>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="cov-fill"></div>
+          </div>
+        </div>
+
         <div class="status-item">
-          <span>التكلفة الإجمالية (Min Z):</span>
-          <strong id="cost-val" style="color: var(--accent-blue)">0 ر.س</strong>
+          <span>التكلفة المحققة (Min Z):</span>
+          <strong id="cost-val" style="color: var(--accent-blue); font-size: 1rem;">0 ر.س</strong>
         </div>
         <div class="status-item">
-          <span>حالة التغطية (Feasibility):</span>
-          <span id="feasible-badge" class="badge badge-fail">غير مكتمل</span>
+          <span>حالة الحل (Status):</span>
+          <span id="feasible-badge" class="badge badge-fail">غير مقبول (Infeasible)</span>
         </div>
       </div>
 
       <div class="panel-box">
-        <h3>فحص القيود (Constraints)</h3>
+        <h3>تحقق القيود (Constraints)</h3>
         <ul class="constraints-list">
-          <li id="c-a"><span>المربع A: x₁ + x₃ ≥ 1</span><span class="status">❌</span></li>
-          <li id="c-b"><span>المربع B: x₁ + x₂ ≥ 1</span><span class="status">❌</span></li>
-          <li id="c-c"><span>المربع C: x₂ ≥ 1</span><span class="status">❌</span></li>
-          <li id="c-d"><span>المربع D: x₂ + x₃ ≥ 1</span><span class="status">❌</span></li>
+          <li id="c-a"><span>المربع A: x₁ + x₃ ≥ 1</span><span class="status">❌ مكشوف</span></li>
+          <li id="c-b"><span>المربع B: x₁ + x₂ ≥ 1</span><span class="status">❌ مكشوف</span></li>
+          <li id="c-c"><span>المربع C: x₂ ≥ 1</span><span class="status">❌ مكشوف</span></li>
+          <li id="c-d"><span>المربع D: x₂ + x₃ ≥ 1</span><span class="status">❌ مكشوف</span></li>
         </ul>
       </div>
     </div>
@@ -249,34 +366,44 @@
 </div>
 
 <script>
-  // بيانات المسألة
   const sites = {
     1: { name: "S1", x: 170, y: 220, cost: 1000, covers: ['A', 'B'], active: false, color: '#f59e0b' },
     2: { name: "S2", x: 380, y: 235, cost: 1200, covers: ['B', 'C', 'D'], active: false, color: '#38bdf8' },
     3: { name: "S3", x: 260, y: 340, cost: 800, covers: ['A', 'D'], active: false, color: '#ec4899' }
   };
 
-  // إحداثيات المربعات السكنية في شكل حذوة فرس
   const blocks = {
-    A: { name: "A", x: 90, y: 280 },
-    B: { name: "B", x: 280, y: 150 },
-    C: { name: "C", x: 380, y: 95 },
-    D: { name: "D", x: 480, y: 160 }
+    A: { name: "A", x: 90, y: 280, distS2: "230m (>150)", ok: false },
+    B: { name: "B", x: 280, y: 150, distS2: "120m", ok: true },
+    C: { name: "C", x: 380, y: 95,  distS2: "110m", ok: true },
+    D: { name: "D", x: 480, y: 160, distS2: "125m", ok: true }
   };
+
+  let showDistances = true;
+  let pulseTick = 0;
 
   const canvas = document.getElementById('simCanvas');
   const ctx = canvas.getContext('2d');
-  const RADIUS = 145; // نصف قطر التغطية المرئي (150 متراً)
+  const RADIUS = 145;
 
   function toggleSite(id) {
     sites[id].active = !sites[id].active;
     updateUI();
   }
 
+  function toggleDistances() {
+    showDistances = !showDistances;
+  }
+
   function applyOptimal() {
     sites[1].active = false;
     sites[2].active = true;
     sites[3].active = true;
+    updateUI();
+  }
+
+  function resetAll() {
+    for (let id in sites) sites[id].active = false;
     updateUI();
   }
 
@@ -294,11 +421,17 @@
 
     document.getElementById('cost-val').innerText = `${totalCost.toLocaleString()} ر.س`;
 
-    // حساب القيود
     const covA = sites[1].active || sites[3].active;
     const covB = sites[1].active || sites[2].active;
     const covC = sites[2].active;
     const covD = sites[2].active || sites[3].active;
+
+    let coveredCount = (covA ? 1 : 0) + (covB ? 1 : 0) + (covC ? 1 : 0) + (covD ? 1 : 0);
+    let pct = (coveredCount / 4) * 100;
+    document.getElementById('cov-pct').innerText = `${pct}%`;
+    const fill = document.getElementById('cov-fill');
+    fill.style.width = `${pct}%`;
+    fill.style.background = pct === 100 ? 'var(--accent-green)' : pct > 0 ? 'var(--accent-amber)' : 'var(--accent-red)';
 
     updateConstraintItem('c-a', covA);
     updateConstraintItem('c-b', covB);
@@ -309,31 +442,34 @@
     const badge = document.getElementById('feasible-badge');
     if (isFeasible) {
       badge.className = 'badge badge-success';
-      badge.innerText = 'حل مقبول (Feasible)';
+      badge.innerText = 'حل أمثل ومقبول (Optimal)';
     } else {
       badge.className = 'badge badge-fail';
       badge.innerText = 'غير مكتمل (Infeasible)';
     }
-
-    render();
   }
 
   function updateConstraintItem(elementId, isCovered) {
     const el = document.getElementById(elementId);
     const statusSpan = el.querySelector('.status');
-    statusSpan.innerText = isCovered ? '✔ مغطى' : '❌ مكشوف';
-    statusSpan.style.color = isCovered ? 'var(--accent-green)' : 'var(--accent-red)';
+    if (isCovered) {
+      statusSpan.innerText = '✔ محقق';
+      statusSpan.style.color = 'var(--accent-green)';
+      el.classList.add('ok');
+    } else {
+      statusSpan.innerText = '❌ مكشوف';
+      statusSpan.style.color = 'var(--accent-red)';
+      el.classList.remove('ok');
+    }
   }
 
-  function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 1. رسم الطريق المنحني (حذوة فرس)
+  function drawNeighborhood() {
+    // شبكة الشوارع الأساسية
     ctx.save();
     ctx.beginPath();
     ctx.ellipse(380, 210, 150, 130, 0, Math.PI * 0.9, Math.PI * 2.1, false);
-    ctx.lineWidth = 44;
-    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 48;
+    ctx.strokeStyle = '#182234';
     ctx.stroke();
 
     ctx.lineWidth = 2;
@@ -342,56 +478,73 @@
     ctx.stroke();
     ctx.restore();
 
-    // طريق المدخل إلى المربع A
+    // شارع المدخل الرئيسي
     ctx.beginPath();
     ctx.moveTo(90, 280);
     ctx.lineTo(260, 220);
-    ctx.lineWidth = 32;
-    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 36;
+    ctx.strokeStyle = '#182234';
     ctx.stroke();
+  }
 
-    // 2. رسم دوائر التغطية للمواقع المفعلة
+  function drawCoverageZones() {
     for (let id in sites) {
       const s = sites[id];
       if (s.active) {
         ctx.save();
         ctx.beginPath();
         ctx.arc(s.x, s.y, RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = s.color + '22';
+        ctx.fillStyle = s.color + '1a';
         ctx.fill();
+
         ctx.lineWidth = 2;
         ctx.strokeStyle = s.color;
         ctx.setLineDash([6, 4]);
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 10;
         ctx.stroke();
         ctx.restore();
       }
     }
+  }
 
-    // 3. خطوط القياس من S2 لتوضيح التغطية المتساوية
-    if (sites[2].active) {
+  function drawMeasurementLines() {
+    if (sites[2].active && showDistances) {
       ctx.save();
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([4, 4]);
-      
-      // B, C, D (ضمن 150م)
-      ['B', 'C', 'D'].forEach(blk => {
-        ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([5, 5]);
+
+      for (let key in blocks) {
+        const b = blocks[key];
+        ctx.strokeStyle = b.ok ? '#38bdf8' : '#f43f5e';
         ctx.beginPath();
         ctx.moveTo(sites[2].x, sites[2].y);
-        ctx.lineTo(blocks[blk].x, blocks[blk].y);
+        ctx.lineTo(b.x, b.y);
         ctx.stroke();
-      });
 
-      // A (خارج النطاق)
-      ctx.strokeStyle = '#ef4444';
-      ctx.beginPath();
-      ctx.moveTo(sites[2].x, sites[2].y);
-      ctx.lineTo(blocks[A].x, blocks[A].y);
-      ctx.stroke();
+        // رسم كبسولة المسافة في المنتصف
+        const midX = (sites[2].x + b.x) / 2;
+        const midY = (sites[2].y + b.y) / 2;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.strokeStyle = b.ok ? '#38bdf8' : '#f43f5e';
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.roundRect(midX - 32, midY - 10, 64, 20, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = b.ok ? '#38bdf8' : '#f43f5e';
+        ctx.font = 'bold 10px Tajawal, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(b.distS2, midX, midY + 1);
+      }
       ctx.restore();
     }
+  }
 
-    // 4. رسم المربعات السكنية (البيوت)
+  function drawBlocks() {
     for (let key in blocks) {
       const b = blocks[key];
       const isCovered = (key === 'A' && (sites[1].active || sites[3].active)) ||
@@ -400,45 +553,79 @@
                         (key === 'D' && (sites[2].active || sites[3].active));
 
       ctx.save();
-      ctx.fillStyle = isCovered ? '#22c55e' : '#475569';
-      ctx.beginPath();
-      ctx.roundRect(b.x - 16, b.y - 16, 32, 32, 6);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      if (isCovered) {
+        ctx.shadowColor = '#10b981';
+        ctx.shadowBlur = 12;
+      }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(b.name, b.x, b.y);
-      ctx.restore();
-    }
-
-    // 5. رسم أيقونات المواقع المقترحة
-    for (let id in sites) {
-      const s = sites[id];
-      ctx.save();
-      ctx.fillStyle = s.active ? s.color : '#64748b';
+      ctx.fillStyle = isCovered ? '#10b981' : '#475569';
       ctx.beginPath();
-      ctx.arc(s.x, s.y, 14, 0, Math.PI * 2);
+      ctx.roundRect(b.x - 17, b.y - 17, 34, 34, 8);
       ctx.fill();
+
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px sans-serif';
+      ctx.font = 'bold 13px Tajawal, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(s.name, s.x, s.y);
+      ctx.fillText(b.name, b.x, b.y + 1);
       ctx.restore();
     }
   }
 
-  // تشغيل أولي
+  function drawSites() {
+    pulseTick += 0.05;
+    const pulseOffset = Math.sin(pulseTick) * 2;
+
+    for (let id in sites) {
+      const s = sites[id];
+      ctx.save();
+
+      if (s.active) {
+        // حلقة النبض
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 18 + pulseOffset, 0, Math.PI * 2);
+        ctx.strokeStyle = s.color + '88';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 14;
+      }
+
+      ctx.fillStyle = s.active ? s.color : '#475569';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Tajawal, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.name, s.x, s.y + 1);
+      ctx.restore();
+    }
+  }
+
+  function renderLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawNeighborhood();
+    drawCoverageZones();
+    drawMeasurementLines();
+    drawBlocks();
+    drawSites();
+    requestAnimationFrame(renderLoop);
+  }
+
   updateUI();
+  requestAnimationFrame(renderLoop);
 </script>
 </body>
 </html>

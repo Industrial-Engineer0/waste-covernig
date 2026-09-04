@@ -321,7 +321,7 @@
             <strong style="color: #ec4899">800 ر.س</strong>
           </button>
           
-          <button class="btn-reset" onclick="resetAll()">تفريغ التحديدات</button>
+          <button class="btn-reset" onclick="resetAll()">تفريغ</button>
         </div>
       </div>
 
@@ -364,7 +364,7 @@
 </div>
 
 <script>
-  // بيانات المواقع وتحديد إزاحات واضحة لمنع أي تداخل بين الكبسولات
+  // بيانات المواقع وتحديد إزاحات واضحة تماماً تمنع أي تراكب
   const sites = {
     1: { 
       name: "S1", x: 170, y: 220, cost: 1000, covers: ['A', 'B'], active: false, color: '#f59e0b',
@@ -386,8 +386,8 @@
       name: "S3", x: 260, y: 340, cost: 800, covers: ['A', 'D'], active: false, color: '#ec4899',
       distances: {
         A: { dist: "140m", ok: true, pos: 0.5 },
-        // تم نقل موضع الكبسولة لـ 0.75 لتجنب موقع S2 تماماً
-        D: { dist: "135m", ok: true, pos: 0.75 }
+        // وضع الكبسولة في النطاق السفلي الخالي (pos: 0.28) بين S3 و S2
+        D: { dist: "135m", ok: true, pos: 0.28 }
       }
     }
   };
@@ -547,7 +547,6 @@
         const dInfo = s.distances[blockKey];
         const b = blocks[blockKey];
 
-        // اختيار اللون: أحمر صريح لـ S2 -> A، أو لون الموقع المخصص
         const lineColor = dInfo.forceRed ? '#ef4444' : (dInfo.ok ? s.color : '#ef4444');
 
         ctx.setLineDash([5, 5]);
@@ -557,7 +556,6 @@
         ctx.lineTo(b.x, b.y);
         ctx.stroke();
 
-        // حساب موضع الكبسولة بناء على النسبة المحددة لمنع التراكب
         const ratio = dInfo.pos || 0.5;
         const midX = s.x + (b.x - s.x) * ratio;
         const midY = s.y + (b.y - s.y) * ratio;
